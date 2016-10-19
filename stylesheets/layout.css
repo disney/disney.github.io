@@ -196,23 +196,13 @@ ul {
     display: inline-block;
     background-image: url("../images/nav_logo-89193ebe6563.png");
     background-repeat: no-repeat;
-    background-position: 0 10px; 
+    background-position: 0 10px;
     width: 240px;
     height: 43px;
     padding-left: 90px;
     padding-top: 20px;
     color: #ffffff;
     vertical-align: middle;
-}
-@media screen and (max-width: 970px) {
-    .header-logo {
-        left: 49px
-    }
-}
-@media screen and (max-width: 865px) {
-    .header-logo {
-        left: -220px;
-    }
 }
 .main-nav-right {
     display: inline-block
@@ -387,21 +377,16 @@ ul {
 .page-header-more {
     position: relative;
     display: inline-block;
-    width: 3000px;
-    height: 51px;
+    width: 100%;
     text-align: center;
     vertical-align: top;
     background-color: #296eb3;
     margin-top: 5px;
-    margin-right: -1750px;
-    padding-right: 15px
 }
 .page-header-more {
-    left: -1035px;
     margin-bottom: 30px;
 }
 .page-header-featured {
-    left: -1010px;
     margin-bottom: 30px;
 }
 .page-title {
@@ -426,13 +411,16 @@ ul {
 
 .page-header-featured>h2,
 .page-header-more>h2 {
+    width: 860px;
+    margin: 0 auto;
+    padding: 11px 0;
     font-size: 30px;
     font-size: 1.875rem;
     font-family: "Raleway", sans-serif;
     font-weight: 200;
     font-style: normal;
+    text-align: left;
     vertical-align: middle;
-    padding-top: 11px;
 }
 @media screen and (max-width: 865px) {
     .page-title>h1,
@@ -444,7 +432,6 @@ ul {
         font-size: 19.2px;
         font-size: 1.2rem;
         font-weight: 500;
-        padding-top: 18px;
     }
 }
 @media screen and (max-width: 865px) {
@@ -454,18 +441,14 @@ ul {
 }
 @media screen and (max-width: 865px) {
     .page-header-logo {
-        left: -1130px;
-
+        padding-bottom: 10px;
     }
 }
 @media screen and (max-width: 865px) {
-    .page-header-featured {
-        left: -1100px;
-    }
-}
-@media screen and (max-width: 865px) {
-    .page-header-more{
-        left: -1115px;
+    .page-header-featured>h2,
+    .page-header-more>h2 {
+        width: unset;
+        text-align: center;
     }
 }
 
@@ -963,7 +946,7 @@ ul {
     background: #ffffff;
 }
 .open-source>.no-img {
-    background: #296eb3;    
+    background: #296eb3;
 }
 .open-source>.open-source-image>span {
     color: #ffffff;
@@ -1025,11 +1008,11 @@ ul {
     border-radius: 0 0 4px 0
 }
 .github-link {
-    margin: 2px 65px 0 0; 
+    margin: 2px 65px 0 0;
     text-align: right;
 }
 .source-link {
-    margin: 10px 65px 0 0; 
+    margin: 10px 65px 0 0;
     text-align: right;
 }
 .source-link>a{
@@ -1041,13 +1024,13 @@ ul {
 }
 @media screen and (max-width: 865px) {
     .github-link {
-        margin: 2px 0px 0 0; 
+        margin: 2px 0px 0 0;
         text-align: center;
     }
 }
 @media screen and (max-width: 865px) {
     .source-link {
-        margin: 10px 0px 10px 0; 
+        margin: 10px 0px 10px 0;
         text-align: center;
     }
 }
