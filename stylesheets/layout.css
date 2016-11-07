@@ -950,10 +950,12 @@ ul {
 }
 .open-source>.open-source-image>span {
     color: #ffffff;
-    display: inline-block;
-    margin-top: 50px;
+    display: table-cell;
     font-size: 30px;
     font-size: 1.875rem;
+    height: 130px;
+    width: 255px;
+    vertical-align: middle;
 }
 .open-source-content {
     display: inline-block;
