@@ -11,7 +11,7 @@ export default function PoliciesPage() {
             The Walt Disney Company is committed to supporting open source software development 
             while ensuring compliance with legal requirements, protecting intellectual property, 
             and maintaining brand integrity. This document outlines our policies for working with 
-            open source software.
+            open source software. 
           </p>
         </section>
 
