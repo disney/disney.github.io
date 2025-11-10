@@ -94,19 +94,34 @@ This site is configured for automatic deployment to GitHub Pages using GitHub Ac
 ### Setup Instructions
 
 1. **Enable GitHub Pages in your repository:**
-   - Go to Settings → Pages
-   - Under "Source", select "GitHub Actions"
+   - Go to your repository on GitHub
+   - Navigate to **Settings** → **Pages**
+   - Under **"Source"**, select **"GitHub Actions"** (NOT "Deploy from a branch")
+   - This is critical - if you select a branch, it will only show the README
+   - Save the settings
 
 2. **Configure GitHub Token (Optional but Recommended):**
-   - Go to Settings → Secrets and variables → Actions
-   - Add a new secret named `GITHUB_TOKEN` with a personal access token
+   - Go to **Settings** → **Secrets and variables** → **Actions**
+   - Click **"New repository secret"**
+   - Name: `GITHUB_TOKEN`
+   - Value: Your GitHub personal access token
    - This increases API rate limits from 60 to 5,000 requests/hour
    - Token needs `public_repo` scope (read-only is sufficient)
+   - You can create a token at: https://github.com/settings/tokens
 
 3. **Deploy:**
-   - Push to the `main` branch
-   - GitHub Actions will automatically build and deploy
+   - Push your code to the `main` branch (or trigger the workflow manually)
+   - Go to **Actions** tab to see the workflow running
+   - Once complete, your site will be live at `https://[username].github.io/[repository-name]`
    - The workflow is defined in `.github/workflows/deploy.yml`
+
+### Troubleshooting
+
+**If you only see the README instead of the site:**
+- Make sure GitHub Pages is set to use **"GitHub Actions"** as the source, not a branch
+- Check the **Actions** tab to ensure the workflow completed successfully
+- Verify the workflow uploaded the artifact from the `./out` directory
+- The `.nojekyll` file in `public/` ensures GitHub Pages doesn't use Jekyll
 
 ### Manual Deployment
 
