@@ -161,6 +161,24 @@ export default function Home() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Introduction Section */}
+        <section className="mb-12 text-center max-w-4xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+            Open Source Software is important to The Walt Disney Company. Disney has established an Open Source Program to encourage our developers to utilize Open Source, contribute to Open Source projects, and to release software as Open Source. We've created this site to highlight Disney's Open Source projects. We encourage you to explore our projects and we welcome your collaboration and contributions. This is just the beginning; there's more to come, so stay tuned! 
+          </p> <br></br>
+          <p className="text-lg md:text-xl text-gray-700 dark:text-gray-300 leading-relaxed">
+            Interested in working with us on projects like this and more? Check out our current job opportunities at{' '}
+            <a
+              href="http://disneytech.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-disney-blue dark:text-disney-blue hover:underline font-semibold"
+            >
+              disneytech.com
+            </a>
+            .
+          </p>
+        </section>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           <Link 
