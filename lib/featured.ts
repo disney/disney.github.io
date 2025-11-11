@@ -1,15 +1,19 @@
-/**
- * Featured Profile Configuration
- * 
- * To update the featured profile, simply change the values below:
- * - username: GitHub username to feature
- * - featuredRepo: Repository name to highlight (must be owned by the username)
- * - description: Optional custom description for the featured section
- */
-
-export const featuredConfig = {
-  username: 'kylifornication-code',
-  featuredRepo: null as string | null, // If null, will use the user's most starred repository/latest repo
-  description: 'Highlighting Disney employees who are making significant contributions to open source.',
+export interface FeaturedProfileConfig {
+  username: string
+  featuredRepo: string | null
+  description: string
 }
+
+export const featuredProfiles: FeaturedProfileConfig[] = [
+  {
+    username: 'kylifornication-code',
+    featuredRepo: 'astro-career-walking-site',
+    description: 'Highlighting Disney employees who are making significant contributions to open source.',
+  },
+  {
+    username: 'disney',
+    featuredRepo: 'disney.github.io',
+    description: 'Sharing open source programs, case studies, and developer resources across the Disney ecosystem.',
+  },
+]
 

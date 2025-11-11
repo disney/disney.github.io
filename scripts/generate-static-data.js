@@ -2,9 +2,6 @@
  * Generate static data files for GitHub Pages deployment
  * This script runs at build time to fetch data from GitHub API
  * and save it as static JSON files that can be served from GitHub Pages
- * 
- * Note: This script uses tsx to run TypeScript files directly
- * Install tsx if needed: npm install --save-dev tsx
  */
 
 const fs = require('fs')
@@ -19,23 +16,60 @@ const octokit = new Octokit({
 // Load config files
 const featuredConfigPath = path.join(__dirname, '../lib/featured.ts')
 const contributorsConfigPath = path.join(__dirname, '../lib/contributors.ts')
-const organizationsPath = path.join(__dirname, '../lib/organizations.ts')
 
 // Helper to read and parse TypeScript config files (simple approach)
-function loadConfig(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8')
-  // Simple extraction - for production, consider using ts-node or tsx
-  if (filePath.includes('featured.ts')) {
-    const usernameMatch = content.match(/username:\s*['"]([^'"]+)['"]/)
-    const repoMatch = content.match(/featuredRepo:\s*(null|[^,}]+)/)
-    const descMatch = content.match(/description:\s*['"]([^'"]+)['"]/)
-    return {
-      username: usernameMatch ? usernameMatch[1] : 'kylifornication-code',
-      featuredRepo: repoMatch && repoMatch[1] !== 'null' ? repoMatch[1].trim().replace(/['"]/g, '') : null,
-      description: descMatch ? descMatch[1] : 'Highlighting Disney employees who are making significant contributions to open source.',
+function loadFeaturedProfiles() {
+  try {
+    const content = fs.readFileSync(featuredConfigPath, 'utf-8')
+    const entryRegex = /{\s*username:\s*['"]([^'"]+)['"]\s*,\s*featuredRepo:\s*([^,\n]+)\s*,\s*description:\s*['"]([^'"]+)['"]/g
+    const profiles = []
+    let match
+
+    while ((match = entryRegex.exec(content)) !== null) {
+      const username = match[1]
+      const rawRepo = match[2].trim()
+      const featuredRepo = rawRepo === 'null' ? null : rawRepo.replace(/['"]/g, '')
+      const description = match[3]
+
+      profiles.push({ username, featuredRepo, description })
     }
+
+    return profiles
+  } catch (error) {
+    console.error('Error loading featured profiles:', error)
+    return []
   }
-  return null
+}
+
+// Load contributor profiles from file
+function loadContributorProfiles() {
+  try {
+    const content = fs.readFileSync(contributorsConfigPath, 'utf-8')
+    // Extract contributor profiles array - this is a simplified parser
+    // For production, consider using a proper TypeScript parser
+    const profiles = []
+    const profileMatches = content.matchAll(/username:\s*['"]([^'"]+)['"]/g)
+    const roleMatches = content.matchAll(/role:\s*['"]([^'"]+)['"]/g)
+    const descMatches = content.matchAll(/description:\s*['"]([^'"]+)['"]/g)
+    
+    // This is a simplified approach - in production, use tsx or proper parsing
+    const usernames = Array.from(profileMatches, m => m[1])
+    const roles = Array.from(roleMatches, m => m[1])
+    const descriptions = Array.from(descMatches, m => m[1])
+    
+    for (let i = 0; i < usernames.length; i++) {
+      profiles.push({
+        username: usernames[i],
+        role: roles[i] || undefined,
+        description: descriptions[i] || undefined,
+        featuredRepo: null,
+      })
+    }
+    return profiles
+  } catch (error) {
+    console.error('Error loading contributor profiles:', error)
+    return []
+  }
 }
 
 // GitHub API functions (replicated here to avoid module issues)
@@ -157,37 +191,6 @@ async function getUserMostStarredRepo(username) {
   }
 }
 
-// Load contributor profiles from file
-function loadContributorProfiles() {
-  try {
-    const content = fs.readFileSync(contributorsConfigPath, 'utf-8')
-    // Extract contributor profiles array - this is a simplified parser
-    // For production, consider using a proper TypeScript parser
-    const profiles = []
-    const profileMatches = content.matchAll(/username:\s*['"]([^'"]+)['"]/g)
-    const roleMatches = content.matchAll(/role:\s*['"]([^'"]+)['"]/g)
-    const descMatches = content.matchAll(/description:\s*['"]([^'"]+)['"]/g)
-    
-    // This is a simplified approach - in production, use tsx or proper parsing
-    const usernames = Array.from(profileMatches, m => m[1])
-    const roles = Array.from(roleMatches, m => m[1])
-    const descriptions = Array.from(descMatches, m => m[1])
-    
-    for (let i = 0; i < usernames.length; i++) {
-      profiles.push({
-        username: usernames[i],
-        role: roles[i] || undefined,
-        description: descriptions[i] || undefined,
-        featuredRepo: null,
-      })
-    }
-    return profiles
-  } catch (error) {
-    console.error('Error loading contributor profiles:', error)
-    return []
-  }
-}
-
 async function generateRepositories() {
   console.log('Generating repositories data...')
   try {
@@ -216,45 +219,58 @@ async function generateRepositories() {
 async function generateFeatured() {
   console.log('Generating featured contributor data...')
   try {
-    const featuredConfig = loadConfig(featuredConfigPath)
-    const { username, featuredRepo } = featuredConfig
-    
-    const user = await getUserProfile(username)
-    if (!user) {
-      throw new Error(`User ${username} not found`)
-    }
+    const featuredProfiles = loadFeaturedProfiles()
 
-    let repo = null
-    if (featuredRepo) {
-      repo = await getRepository(username, featuredRepo)
-    } else {
-      repo = await getUserMostStarredRepo(username)
-    }
+    const featuredData = await Promise.all(
+      featuredProfiles.map(async (profile) => {
+        try {
+          const user = await getUserProfile(profile.username)
+          if (!user) {
+            console.warn(`Featured profile skipped: user ${profile.username} not found`)
+            return null
+          }
 
-    const data = {
-      user,
-      repository: repo,
-      config: featuredConfig,
-    }
-    
+          let repository = null
+          if (profile.featuredRepo) {
+            repository = await getRepository(profile.username, profile.featuredRepo)
+          }
+
+          if (!repository) {
+            repository = await getUserMostStarredRepo(profile.username)
+          }
+
+          return {
+            user,
+            repository,
+            config: profile,
+          }
+        } catch (error) {
+          console.error(`Featured profile skipped for ${profile.username}:`, error)
+          return null
+        }
+      })
+    )
+
+    const validFeatured = featuredData.filter(Boolean)
+
     const outputPath = path.join(__dirname, '../public/data/featured.json')
     const outputDir = path.dirname(outputPath)
-    
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true })
     }
-    
-    fs.writeFileSync(outputPath, JSON.stringify(data, null, 2))
-    console.log('✓ Generated featured contributor data')
+
+    fs.writeFileSync(outputPath, JSON.stringify(validFeatured, null, 2))
+    console.log(`✓ Generated ${validFeatured.length} featured profiles`)
   } catch (error) {
     console.error('Error generating featured data:', error)
-    // Write empty object on error
+    // Write empty array on error
     const outputPath = path.join(__dirname, '../public/data/featured.json')
     const outputDir = path.dirname(outputPath)
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true })
     }
-    fs.writeFileSync(outputPath, JSON.stringify({ user: null, repository: null, config: featuredConfig }, null, 2))
+    fs.writeFileSync(outputPath, JSON.stringify([], null, 2))
   }
 }
 

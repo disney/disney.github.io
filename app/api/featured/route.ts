@@ -1,38 +1,45 @@
 import { NextResponse } from 'next/server'
 import { getUserProfile, getUserMostStarredRepo, getRepository } from '@/lib/github'
-import { featuredConfig } from '@/lib/featured'
+import { featuredProfiles } from '@/lib/featured'
 
 export async function GET() {
   try {
-    const { username, featuredRepo } = featuredConfig
+    const data = await Promise.all(
+      featuredProfiles.map(async (profile) => {
+        try {
+          const user = await getUserProfile(profile.username)
+          if (!user) {
+            return null
+          }
 
-    // Fetch user profile
-    const user = await getUserProfile(username)
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      )
-    }
+          let repository = null
+          if (profile.featuredRepo) {
+            repository = await getRepository(profile.username, profile.featuredRepo)
+          }
 
-    // Fetch featured repository
-    let repo = null
-    if (featuredRepo) {
-      repo = await getRepository(username, featuredRepo)
-    } else {
-      // If no specific repo is configured, get the most starred one
-      repo = await getUserMostStarredRepo(username)
-    }
+          if (!repository) {
+            repository = await getUserMostStarredRepo(profile.username)
+          }
 
-    return NextResponse.json({
-      user,
-      repository: repo,
-      config: featuredConfig,
-    })
+          return {
+            user,
+            repository,
+            config: profile,
+          }
+        } catch (error) {
+          console.error(`Error fetching featured profile for ${profile.username}:`, error)
+          return null
+        }
+      })
+    )
+
+    const validProfiles = data.filter(Boolean)
+
+    return NextResponse.json(validProfiles)
   } catch (error) {
     console.error('Error in featured API route:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch featured profile' },
+      { error: 'Failed to fetch featured profiles' },
       { status: 500 }
     )
   }
