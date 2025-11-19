@@ -40,3 +40,6 @@ next-env.d.ts
 
 # Generated static data (will be regenerated at build time)
 /public/data/
+
+#cursor
+.cursor/

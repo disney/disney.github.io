@@ -11,6 +11,8 @@ export const disneyOrganizations = [
   'hulu',
   'fxnetworks',
   'espn',
+  'lucasfilm',
+  'pixaranimationstudios',
   'disneystreaming',
 ]
 
@@ -20,6 +22,8 @@ export const disneyOrganizations = [
 export const organizationNames: Record<string, string> = {
   'disney': 'Disney',
   'wdas': 'Walt Disney Animation Studios',
+  'lucasfilm': 'Lucasfilm',
+  'pixaranimationstudios': 'Pixar Animation Studios',
   'hulu': 'Hulu',
   'fxnetworks': 'FX Networks',
   'espn': 'ESPN',
