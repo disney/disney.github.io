@@ -7,7 +7,7 @@ export interface FeaturedProfileConfig {
 export const featuredProfiles: FeaturedProfileConfig[] = [
   {
     username: 'kylifornication-code',
-    featuredRepo: 'disney.github.io',
+    featuredRepo: 'disney/disney.github.io',
     description: 'Highlighting Disney employees who are making significant contributions to open source.',
   },
   {

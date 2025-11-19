@@ -33,13 +33,7 @@ export const contributorProfiles: ContributorProfileConfig[] = [
 //    description:
 //      'Championing open source culture at Disney Streaming and leading by example through public contributions.',
 //  },
-  {
-    username: 'kylifornication-code',
-    featuredRepo: null,
-    role: 'Senior Software Engineer, Disney Streaming',
-    description:
-      'Championing open source culture at Disney Streaming and leading by example through public contributions.',
-  },
+
   {
     username: 'iancward',
     role: 'Staff Reliability Engineer',
