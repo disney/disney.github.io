@@ -230,8 +230,9 @@ export default function ContributionPage() {
           </p>
           <p className="text-gray-700 dark:text-gray-300">
             To add someone new, update the configuration in <code className="px-1 py-0.5 bg-white/70 dark:bg-gray-900 rounded text-sm">lib/contributors.ts</code>
-            and deploy. The site will automatically pull their GitHub profile and highlight one of their
-            public repositories.
+            and deploy. For contributors with GitHub accounts, the site will automatically pull their GitHub profile 
+            and highlight one of their public repositories. For contributors without GitHub accounts, provide their 
+            name and email to create a profile.
           </p>
         </div>
 
@@ -270,6 +271,8 @@ export default function ContributionPage() {
             {contributors.map(({ user, repository, config }) => {
               const displayName = user.name || user.login
               const profileDescription = config.description || user.bio
+              const isMockProfile = user.html_url.startsWith('mailto:')
+              const email = isMockProfile ? user.html_url.replace('mailto:', '') : null
 
               return (
                 <div
@@ -289,14 +292,27 @@ export default function ContributionPage() {
                         <h3 className="text-2xl font-semibold text-disney-navy dark:text-disney-blue">
                           {displayName}
                         </h3>
-                        <a
-                          href={user.html_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-disney-blue hover:underline"
-                        >
-                          @{user.login}
-                        </a>
+                        {!isMockProfile ? (
+                          <a
+                            href={user.html_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-disney-blue hover:underline"
+                          >
+                            @{user.login}
+                          </a>
+                        ) : email ? (
+                          <a
+                            href={`mailto:${email}`}
+                            className="text-sm text-disney-blue hover:underline"
+                          >
+                            {email}
+                          </a>
+                        ) : (
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {displayName}
+                          </span>
+                        )}
                         {config.role && (
                           <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                             {config.role}
@@ -310,14 +326,23 @@ export default function ContributionPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <a
-                        href={user.html_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center px-4 py-2 border border-disney-blue text-disney-blue dark:text-disney-blue rounded-lg hover:bg-disney-blue hover:text-white transition-colors"
-                      >
-                        View GitHub Profile
-                      </a>
+                      {!isMockProfile ? (
+                        <a
+                          href={user.html_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center px-4 py-2 border border-disney-blue text-disney-blue dark:text-disney-blue rounded-lg hover:bg-disney-blue hover:text-white transition-colors"
+                        >
+                          View GitHub Profile
+                        </a>
+                      ) : email ? (
+                        <a
+                          href={`mailto:${email}`}
+                          className="inline-flex items-center justify-center px-4 py-2 border border-disney-blue text-disney-blue dark:text-disney-blue rounded-lg hover:bg-disney-blue hover:text-white transition-colors"
+                        >
+                          Contact
+                        </a>
+                      ) : null}
                     </div>
                   </div>
 

@@ -215,3 +215,47 @@ export async function getDisneyContributions(): Promise<Contribution[]> {
   return []
 }
 
+/**
+ * Generate a mock GitHub user profile for contributors without GitHub accounts
+ * Uses initials from name or email to create a consistent avatar placeholder
+ */
+export function createMockGitHubUser(
+  name: string,
+  email?: string
+): GitHubUser {
+  // Generate initials from name or email
+  const getInitials = (str: string): string => {
+    const parts = str.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return str.substring(0, 2).toUpperCase()
+  }
+
+  const initials = getInitials(name || email || 'U')
+  
+  // Create a consistent avatar URL using a service that generates avatars from initials
+  // Using UI Avatars service which generates nice colored avatars from initials
+  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=003d82&color=fff&size=256&bold=true`
+
+  // Create a display username from name or email
+  const displayUsername = name
+    ? name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    : email
+    ? email.split('@')[0]
+    : 'contributor'
+
+  return {
+    login: displayUsername,
+    name: name || email?.split('@')[0] || 'Contributor',
+    bio: null,
+    avatar_url: avatarUrl,
+    html_url: `mailto:${email || ''}`, // Use mailto link instead of GitHub URL
+    public_repos: 0,
+    followers: 0,
+    following: 0,
+    company: null,
+    location: null,
+  }
+}
+

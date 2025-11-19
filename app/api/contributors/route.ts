@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getRepository, getUserMostStarredRepo, getUserProfile } from '@/lib/github'
+import { getRepository, getUserMostStarredRepo, getUserProfile, createMockGitHubUser } from '@/lib/github'
 import { contributorProfiles } from '@/lib/contributors'
 
 export async function GET() {
@@ -7,20 +7,35 @@ export async function GET() {
     const contributors = (await Promise.all(
       contributorProfiles.map(async (profile) => {
         try {
-          const user = await getUserProfile(profile.username)
-
-          if (!user) {
-            console.warn(`Contributor profile skipped: user ${profile.username} not found`)
-            return null
-          }
-
+          let user
           let repository = null
-          if (profile.featuredRepo) {
-            repository = await getRepository(profile.username, profile.featuredRepo)
-          }
 
-          if (!repository) {
-            repository = await getUserMostStarredRepo(profile.username)
+          // Check if this is a GitHub profile or a non-GitHub profile
+          if (profile.username) {
+            // GitHub profile - fetch from GitHub API
+            user = await getUserProfile(profile.username)
+
+            if (!user) {
+              console.warn(`Contributor profile skipped: user ${profile.username} not found`)
+              return null
+            }
+
+            // Try to get featured repository or most starred repo
+            if (profile.featuredRepo) {
+              repository = await getRepository(profile.username, profile.featuredRepo)
+            }
+
+            if (!repository) {
+              repository = await getUserMostStarredRepo(profile.username)
+            }
+          } else if (profile.name) {
+            // Non-GitHub profile - create mock profile
+            user = createMockGitHubUser(profile.name, profile.email)
+            // Non-GitHub profiles don't have repositories
+            repository = null
+          } else {
+            console.warn('Contributor profile skipped: must have either username or name')
+            return null
           }
 
           return {
@@ -29,7 +44,8 @@ export async function GET() {
             config: profile,
           }
         } catch (error) {
-          console.error(`Contributor profile skipped for ${profile.username}:`, error)
+          const identifier = profile.username || profile.name || 'unknown'
+          console.error('Contributor profile skipped for', identifier, ':', error)
           return null
         }
       })
