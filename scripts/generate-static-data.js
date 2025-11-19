@@ -78,7 +78,20 @@ function loadContributorProfiles() {
       
       // Extract featuredRepo (optional)
       const repoMatch = block.match(/featuredRepo:\s*(null|['"]([^'"]+)['"])/)
-      const featuredRepo = repoMatch && repoMatch[1] !== 'null' ? repoMatch[2] : null
+      let featuredRepo = repoMatch && repoMatch[1] !== 'null' ? repoMatch[2] : null
+      
+      // Also try to extract from description if not found
+      if (!featuredRepo) {
+        const descMatch = block.match(/description:\s*['"]([^'"]+)['"]/)
+        if (descMatch) {
+          const desc = descMatch[1]
+          // Try to extract repo from description like "Contributing to owner/repo."
+          const repoInDesc = desc.match(/Contributing to ([a-zA-Z0-9._/-]+)\./)
+          if (repoInDesc && repoInDesc[1].includes('/')) {
+            featuredRepo = repoInDesc[1]
+          }
+        }
+      }
       
       // Only add if we have either username or name
       if (username || name) {
@@ -369,8 +382,17 @@ async function generateContributors() {
           } else if (profile.name) {
             // Non-GitHub profile - create mock profile
             user = createMockGitHubUser(profile.name, profile.email)
-            // Non-GitHub profiles don't have repositories
-            repository = null
+            
+            // Try to fetch repository if featuredRepo is provided
+            if (profile.featuredRepo) {
+              // featuredRepo might be in format "owner/repo" or just "repo"
+              const repoParts = profile.featuredRepo.split('/')
+              if (repoParts.length === 2) {
+                // Format: owner/repo
+                repository = await getRepository(repoParts[0], repoParts[1])
+              }
+              // If just repo name or fetch failed, leave as null - frontend will handle from config
+            }
           } else {
             console.warn('Contributor profile skipped: must have either username or name')
             return null

@@ -41,6 +41,7 @@ export default function ContributionPage() {
   const [contributors, setContributors] = useState<ContributorProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     async function fetchContributors() {
@@ -279,8 +280,84 @@ export default function ContributionPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-8">
-            {contributors.map(({ user, repository, config }) => {
+          <>
+            {/* Search Input */}
+            <div className="mb-8">
+              <div className="relative max-w-md">
+                <input
+                  type="text"
+                  placeholder="Search contributors by name, email, project, or description..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-disney-blue focus:border-transparent"
+                />
+                <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    aria-label="Clear search"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {(() => {
+              const filteredContributors = contributors.filter(({ user, repository, config }) => {
+                if (!searchQuery) return true
+                
+                const query = searchQuery.toLowerCase()
+                const displayName = (user.name || user.login || '').toLowerCase()
+                const email = (user.html_url.startsWith('mailto:') ? user.html_url.replace('mailto:', '') : '').toLowerCase()
+                const role = (config.role || '').toLowerCase()
+                const description = (config.description || user.bio || '').toLowerCase()
+                const repoName = repository ? `${repository.owner}/${repository.name}`.toLowerCase() : (config.featuredRepo || '').toLowerCase()
+                
+                return displayName.includes(query) || 
+                       email.includes(query) || 
+                       role.includes(query) || 
+                       description.includes(query) || 
+                       repoName.includes(query)
+              })
+
+              return (
+                <>
+                  {searchQuery && (
+                    <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                      {filteredContributors.length} contributor{filteredContributors.length !== 1 ? 's' : ''} found
+                    </p>
+                  )}
+                  {filteredContributors.length === 0 ? (
+                    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-12 text-center">
+                      <p className="text-gray-600 dark:text-gray-400">
+                        No contributors found matching "{searchQuery}"
+                      </p>
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="mt-4 text-disney-blue hover:underline"
+                      >
+                        Clear search
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-8">
+                      {filteredContributors.map(({ user, repository, config }) => {
               const displayName = user.name || user.login
               const profileDescription = config.description || user.bio
               const isMockProfile = user.html_url.startsWith('mailto:')
@@ -364,42 +441,73 @@ export default function ContributionPage() {
                     </p>
                   )}
 
-                  {repository && (
+                  {(repository || (isMockProfile && config.featuredRepo)) && (
                     <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
                       <h4 className="text-lg font-semibold text-disney-navy dark:text-disney-blue mb-3">
                         Highlighted Project
                       </h4>
                       <div>
-                        <a
-                          href={repository.html_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xl font-semibold text-disney-blue hover:underline"
-                        >
-                          {repository.owner}/{repository.name}
-                        </a>
-                        {repository.description && (
-                          <p className="mt-2 text-gray-700 dark:text-gray-300">
-                            {repository.description}
-                          </p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-4">
-                          {repository.language && (
-                            <span className="flex items-center">
-                              <span className="w-2.5 h-2.5 rounded-full bg-disney-blue mr-2"></span>
-                              {repository.language}
-                            </span>
-                          )}
-                          <span>⭐ {repository.stargazers_count.toLocaleString()}</span>
-                          <span>🍴 {repository.forks_count.toLocaleString()}</span>
-                        </div>
+                        {repository ? (
+                          <>
+                            <a
+                              href={repository.html_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xl font-semibold text-disney-blue hover:underline"
+                            >
+                              {repository.owner}/{repository.name}
+                            </a>
+                            {repository.description && (
+                              <p className="mt-2 text-gray-700 dark:text-gray-300">
+                                {repository.description}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mt-4">
+                              {repository.language && (
+                                <span className="flex items-center">
+                                  <span className="w-2.5 h-2.5 rounded-full bg-disney-blue mr-2"></span>
+                                  {repository.language}
+                                </span>
+                              )}
+                              <span>⭐ {repository.stargazers_count.toLocaleString()}</span>
+                              <span>🍴 {repository.forks_count.toLocaleString()}</span>
+                            </div>
+                          </>
+                        ) : config.featuredRepo ? (
+                          <>
+                            {config.featuredRepo.includes('/') ? (
+                              <a
+                                href={`https://github.com/${config.featuredRepo}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xl font-semibold text-disney-blue hover:underline"
+                              >
+                                {config.featuredRepo}
+                              </a>
+                            ) : (
+                              <span className="text-xl font-semibold text-disney-navy dark:text-disney-blue">
+                                {config.featuredRepo}
+                              </span>
+                            )}
+                            {config.featuredRepo.includes('/') && (
+                              <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm">
+                                View this project on GitHub
+                              </p>
+                            )}
+                          </>
+                        ) : null}
                       </div>
                     </div>
                   )}
                 </div>
+                      )
+                    })}
+                    </div>
+                  )}
+                </>
               )
-            })}
-          </div>
+            })()}
+          </>
         )}
       </section>
       </div>

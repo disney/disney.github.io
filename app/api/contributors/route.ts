@@ -31,8 +31,20 @@ export async function GET() {
           } else if (profile.name) {
             // Non-GitHub profile - create mock profile
             user = createMockGitHubUser(profile.name, profile.email)
-            // Non-GitHub profiles don't have repositories
-            repository = null
+            
+            // Try to fetch repository if featuredRepo is provided
+            if (profile.featuredRepo) {
+              // featuredRepo might be in format "owner/repo" or just "repo"
+              const repoParts = profile.featuredRepo.split('/')
+              if (repoParts.length === 2) {
+                // Format: owner/repo
+                repository = await getRepository(repoParts[0], repoParts[1])
+              } else if (repoParts.length === 1) {
+                // Just repo name - we can't fetch without owner, so leave as null
+                // The frontend will handle displaying it from config
+                repository = null
+              }
+            }
           } else {
             console.warn('Contributor profile skipped: must have either username or name')
             return null
