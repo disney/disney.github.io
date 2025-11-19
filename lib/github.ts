@@ -156,8 +156,14 @@ export async function getUserProfile(username: string): Promise<GitHubUser | nul
       company: data.company,
       location: data.location,
     }
-  } catch (error) {
-    console.error(`Error fetching user profile for ${username}:`, error)
+  } catch (error: any) {
+    if (error?.status === 404) {
+      console.error(`GitHub user ${username} not found (404)`)
+    } else if (error?.status === 403) {
+      console.error(`GitHub API rate limit exceeded or forbidden for ${username} (403)`)
+    } else {
+      console.error(`Error fetching user profile for ${username}:`, error?.message || error)
+    }
     return null
   }
 }

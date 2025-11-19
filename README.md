@@ -100,14 +100,15 @@ This site is configured for automatic deployment to GitHub Pages using GitHub Ac
    - This is critical - if you select a branch, it will only show the README
    - Save the settings
 
-2. **Configure GitHub Token (Optional but Recommended):**
+2. **Configure GitHub API Token (Required for fetching contributor profiles):**
    - Go to **Settings** → **Secrets and variables** → **Actions**
    - Click **"New repository secret"**
-   - Name: `GITHUB_TOKEN`
+   - Name: `GH_TOKEN`
    - Value: Your GitHub personal access token
-   - This increases API rate limits from 60 to 5,000 requests/hour
+   - This increases API rate limits from 60 to 5,000 requests/hour and allows fetching user profiles
    - Token needs `public_repo` scope (read-only is sufficient)
    - You can create a token at: https://github.com/settings/tokens
+   - **Note:** Without this token, the site may fail to fetch GitHub user profiles during build
 
 3. **Deploy:**
    - Push your code to the `main` branch (or trigger the workflow manually)

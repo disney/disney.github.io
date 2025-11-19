@@ -34,6 +34,19 @@ export const contributorProfiles: ContributorProfileConfig[] = [
 //      'Championing open source culture at Disney Streaming and leading by example through public contributions.',
 //  },
   {
+    username: 'kylifornication-code',
+    featuredRepo: null,
+    role: 'Senior Software Engineer, Disney Streaming',
+    description:
+      'Championing open source culture at Disney Streaming and leading by example through public contributions.',
+  },
+  {
+    username: 'iancward',
+    role: 'Staff Reliability Engineer',
+    featuredRepo: 'open-telemetry/opentelemetry-js-contrib',
+    description: 'Contributing to open-telemetry/opentelemetry-js-contrib.',
+  },
+  {
     name: 'Dang H. Nguyen',
     email: 'dang.nguyen@disney.com',
     featuredRepo: 'chef-cookbooks/chef-splunk',
@@ -244,8 +257,8 @@ export const contributorProfiles: ContributorProfileConfig[] = [
     description: 'Contributing to apache/beam.',
   },
   {
-    name: 'Ian Ward',
-    email: 'ian.ward@disney.com',
+    username: 'iancward',
+    role: 'Staff Reliability Engineer',
     featuredRepo: 'DataDog/chef-datadog',
     description: 'Contributing to DataDog/chef-datadog.',
   },

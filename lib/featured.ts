@@ -7,13 +7,13 @@ export interface FeaturedProfileConfig {
 export const featuredProfiles: FeaturedProfileConfig[] = [
   {
     username: 'kylifornication-code',
-    featuredRepo: 'astro-career-walking-site',
+    featuredRepo: 'disney.github.io',
     description: 'Highlighting Disney employees who are making significant contributions to open source.',
   },
   {
-    username: 'disney',
-    featuredRepo: 'disney.github.io',
-    description: 'Sharing open source programs, case studies, and developer resources across the Disney ecosystem.',
+    username: 'iancward',
+    featuredRepo: 'open-telemetry/opentelemetry-js-contrib',
+    description: 'Contributing to open-telemetry/opentelemetry-js-contrib.',
   },
 ]
 

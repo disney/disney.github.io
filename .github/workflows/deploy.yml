@@ -33,7 +33,7 @@ jobs:
 
       - name: Generate static data
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: npm run generate-data
 
       - name: Build with Next.js
