@@ -48,23 +48,51 @@ function loadContributorProfiles() {
     // Extract contributor profiles array - this is a simplified parser
     // For production, consider using a proper TypeScript parser
     const profiles = []
-    const profileMatches = content.matchAll(/username:\s*['"]([^'"]+)['"]/g)
-    const roleMatches = content.matchAll(/role:\s*['"]([^'"]+)['"]/g)
-    const descMatches = content.matchAll(/description:\s*['"]([^'"]+)['"]/g)
     
-    // This is a simplified approach - in production, use tsx or proper parsing
-    const usernames = Array.from(profileMatches, m => m[1])
-    const roles = Array.from(roleMatches, m => m[1])
-    const descriptions = Array.from(descMatches, m => m[1])
+    // Match complete profile objects (handles both GitHub and non-GitHub profiles)
+    const profileBlockRegex = /{\s*([^}]+)\s*}/g
+    let match
     
-    for (let i = 0; i < usernames.length; i++) {
-      profiles.push({
-        username: usernames[i],
-        role: roles[i] || undefined,
-        description: descriptions[i] || undefined,
-        featuredRepo: null,
-      })
+    while ((match = profileBlockRegex.exec(content)) !== null) {
+      const block = match[1]
+      
+      // Extract username (optional)
+      const usernameMatch = block.match(/username:\s*['"]([^'"]+)['"]/)
+      const username = usernameMatch ? usernameMatch[1] : undefined
+      
+      // Extract name (optional)
+      const nameMatch = block.match(/name:\s*['"]([^'"]+)['"]/)
+      const name = nameMatch ? nameMatch[1] : undefined
+      
+      // Extract email (optional)
+      const emailMatch = block.match(/email:\s*['"]([^'"]+)['"]/)
+      const email = emailMatch ? emailMatch[1] : undefined
+      
+      // Extract role (optional)
+      const roleMatch = block.match(/role:\s*['"]([^'"]+)['"]/)
+      const role = roleMatch ? roleMatch[1] : undefined
+      
+      // Extract description (optional, handles multi-line)
+      const descMatch = block.match(/description:\s*['"]([^'"]+)['"]/)
+      const description = descMatch ? descMatch[1] : undefined
+      
+      // Extract featuredRepo (optional)
+      const repoMatch = block.match(/featuredRepo:\s*(null|['"]([^'"]+)['"])/)
+      const featuredRepo = repoMatch && repoMatch[1] !== 'null' ? repoMatch[2] : null
+      
+      // Only add if we have either username or name
+      if (username || name) {
+        profiles.push({
+          username,
+          name,
+          email,
+          role,
+          description,
+          featuredRepo,
+        })
+      }
     }
+    
     return profiles
   } catch (error) {
     console.error('Error loading contributor profiles:', error)
@@ -274,6 +302,43 @@ async function generateFeatured() {
   }
 }
 
+// Create mock GitHub user for non-GitHub contributors
+function createMockGitHubUser(name, email) {
+  // Generate initials from name or email
+  const getInitials = (str) => {
+    const parts = str.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+    }
+    return str.substring(0, 2).toUpperCase()
+  }
+
+  const initials = getInitials(name || email || 'U')
+  
+  // Create a consistent avatar URL using UI Avatars service
+  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=003d82&color=fff&size=256&bold=true`
+
+  // Create a display username from name or email
+  const displayUsername = name
+    ? name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    : email
+    ? email.split('@')[0]
+    : 'contributor'
+
+  return {
+    login: displayUsername,
+    name: name || email?.split('@')[0] || 'Contributor',
+    bio: null,
+    avatar_url: avatarUrl,
+    html_url: `mailto:${email || ''}`,
+    public_repos: 0,
+    followers: 0,
+    following: 0,
+    company: null,
+    location: null,
+  }
+}
+
 async function generateContributors() {
   console.log('Generating contributors data...')
   try {
@@ -281,19 +346,34 @@ async function generateContributors() {
     const contributors = await Promise.all(
       contributorProfiles.map(async (profile) => {
         try {
-          const user = await getUserProfile(profile.username)
-          if (!user) {
-            console.warn(`Contributor profile skipped: user ${profile.username} not found`)
-            return null
-          }
-
+          let user
           let repository = null
-          if (profile.featuredRepo) {
-            repository = await getRepository(profile.username, profile.featuredRepo)
-          }
 
-          if (!repository) {
-            repository = await getUserMostStarredRepo(profile.username)
+          // Check if this is a GitHub profile or a non-GitHub profile
+          if (profile.username) {
+            // GitHub profile - fetch from GitHub API
+            user = await getUserProfile(profile.username)
+            if (!user) {
+              console.warn(`Contributor profile skipped: user ${profile.username} not found`)
+              return null
+            }
+
+            // Try to get featured repository or most starred repo
+            if (profile.featuredRepo) {
+              repository = await getRepository(profile.username, profile.featuredRepo)
+            }
+
+            if (!repository) {
+              repository = await getUserMostStarredRepo(profile.username)
+            }
+          } else if (profile.name) {
+            // Non-GitHub profile - create mock profile
+            user = createMockGitHubUser(profile.name, profile.email)
+            // Non-GitHub profiles don't have repositories
+            repository = null
+          } else {
+            console.warn('Contributor profile skipped: must have either username or name')
+            return null
           }
 
           return {
@@ -302,7 +382,8 @@ async function generateContributors() {
             config: profile,
           }
         } catch (error) {
-          console.error(`Contributor profile skipped for ${profile.username}:`, error)
+          const identifier = profile.username || profile.name || 'unknown'
+          console.error(`Contributor profile skipped for ${identifier}:`, error)
           return null
         }
       })

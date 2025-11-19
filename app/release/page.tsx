@@ -29,7 +29,19 @@ export default function ReleasePage() {
   useEffect(() => {
     async function fetchRepositories() {
       try {
-        const response = await fetch('/data/repositories.json')
+        // Try static data first (for production builds)
+        let response = await fetch('/data/repositories.json')
+        if (response.ok) {
+          const data = await response.json()
+          if (Array.isArray(data) && data.length > 0) {
+            setRepositories(data)
+            setLoading(false)
+            return
+          }
+        }
+
+        // Fallback to API route (for local development)
+        response = await fetch('/api/repositories')
         if (!response.ok) {
           throw new Error('Failed to fetch repositories')
         }

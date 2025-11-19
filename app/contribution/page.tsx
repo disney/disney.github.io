@@ -45,7 +45,19 @@ export default function ContributionPage() {
   useEffect(() => {
     async function fetchContributors() {
       try {
-        const response = await fetch('/data/contributors.json')
+        // Try static data first (for production builds)
+        let response = await fetch('/data/contributors.json')
+        if (response.ok) {
+          const data = await response.json()
+          if (Array.isArray(data) && data.length > 0) {
+            setContributors(data)
+            setLoading(false)
+            return
+          }
+        }
+
+        // Fallback to API route (for local development)
+        response = await fetch('/api/contributors')
         if (!response.ok) {
           throw new Error('Failed to fetch contributor profiles')
         }
