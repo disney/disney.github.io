@@ -25,14 +25,6 @@ export interface ContributorProfileConfig {
 }
 
 export const contributorProfiles: ContributorProfileConfig[] = [
-// Example of a GitHub contributor profile
-//  {
-//    username: 'kylifornication-code',
-//    featuredRepo: null,
-//    role: 'Senior Software Engineer, Disney Streaming',
-//    description:
-//      'Championing open source culture at Disney Streaming and leading by example through public contributions.',
-//  },
 
   {
     username: 'iancward',
