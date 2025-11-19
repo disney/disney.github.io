@@ -3,7 +3,7 @@ import { Octokit } from '@octokit/rest'
 // Initialize Octokit - in production, use environment variables for auth
 // If no token is provided, API calls will use unauthenticated rate limits (60 requests/hour)
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN || undefined, // Optional: for higher rate limits
+  auth: process.env.GH_TOKEN || undefined, // Optional: for higher rate limits
 })
 
 export interface Repository {

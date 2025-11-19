@@ -10,7 +10,7 @@ const { Octokit } = require('@octokit/rest')
 
 // Initialize Octokit
 const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN || undefined,
+  auth: process.env.GH_TOKEN || undefined,
 })
 
 // Load config files
