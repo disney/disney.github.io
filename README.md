@@ -32,8 +32,9 @@ npm install
 
 3. Set up environment variables (optional, for higher GitHub API rate limits):
 ```bash
-cp .env.example .env.local
-# Edit .env.local and add your GITHUB_TOKEN
+# Create .env.local file in the project root
+echo "GH_TOKEN=your_github_personal_access_token_here" > .env.local
+# Edit .env.local and replace with your actual GitHub token
 ```
 
 4. Run the development server:
@@ -61,7 +62,11 @@ site/
 
 ## Environment Variables
 
-- `GITHUB_TOKEN` (optional): GitHub personal access token for higher API rate limits
+- `GH_TOKEN` (optional): GitHub personal access token for higher API rate limits (5,000 requests/hour instead of 60)
+  - Create a token at: https://github.com/settings/tokens
+  - Token needs `public_repo` scope (read-only is sufficient)
+  - For local development: Add to `.env.local` file
+  - For GitHub Pages: Add as `GH_TOKEN` secret in repository settings
 
 ## Building for Production
 
