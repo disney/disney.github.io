@@ -19,16 +19,6 @@ export default function Footer() {
                   Policies
                 </Link>
               </li>
-              <li>
-                <Link href="/release" className="text-gray-300 hover:text-white transition-colors">
-                  Release
-                </Link>
-              </li>
-              <li>
-                <Link href="/contribution" className="text-gray-300 hover:text-white transition-colors">
-                  Contributing
-                </Link>
-              </li>
             </ul>
           </div>
           <div>

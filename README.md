@@ -1,13 +1,14 @@
 # Disney Open Source Program Office Documentation Site
 
-A comprehensive documentation site for The Walt Disney Company's Open Source Program Office, built with Next.js.
+A documentation site for The Walt Disney Company's Open Source Program Office, built with Next.js.
+
+> **Scope note:** This is a reduced-scope launch. The site currently ships with only the **Home** and **Policies** pages while additional requirements are being finalized. The Usage, Distribution, Release, and Contribution pages, along with the featured-contributor and contributor-profile features, have been removed for now and can be reintroduced later.
 
 ## Features
 
-- **Documentation Pages**: Comprehensive guides on policies, usage, distribution, release, and contribution
+- **Home Page**: Overview of the Disney Open Source Program Office, plus a browser for public repositories released by Disney teams
+- **Policies Page**: Open source policies and guidelines
 - **Repository Browser**: Browse and search public repositories from multiple Disney GitHub organizations
-- **Contributor Profiles**: View approved Disney employee contributors and their highlighted projects (easily configurable)
-- **Featured Contributor Section**: Highlight Disney employees and their open source projects (easily configurable)
 - **Brand Compliant**: Designed to align with Disney brand guidelines and accessibility standards
 
 ## Getting Started
@@ -49,12 +50,8 @@ npm run dev
 ```
 site/
 ├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes
-│   ├── policies/          # Policies documentation
-│   ├── usage/             # Using open source guide
-│   ├── distribution/      # Distribution guide
-│   ├── release/           # Release process guide and repository browser
-│   └── contribution/      # Contributing guide and contributor profiles
+│   ├── api/               # API routes (repositories)
+│   └── policies/          # Policies documentation
 ├── components/            # React components
 ├── lib/                   # Utility functions
 └── public/               # Static assets
@@ -105,7 +102,7 @@ This site is configured for automatic deployment to GitHub Pages using GitHub Ac
    - This is critical - if you select a branch, it will only show the README
    - Save the settings
 
-2. **Configure GitHub API Token (Required for fetching contributor profiles):**
+2. **Configure GitHub API Token (Recommended for higher API rate limits when fetching repositories):**
    - Go to **Settings** → **Secrets and variables** → **Actions**
    - Click **"New repository secret"**
    - Name: `GH_TOKEN`
@@ -177,19 +174,6 @@ This site adheres to The Walt Disney Company's brand guidelines:
 - Consistent typography and spacing
 - Brand-appropriate tone and messaging
 
-## Managing Contributor Profiles
-
-The contributor profiles section on the Contributing page is backed by a simple configuration file. To manage the list of approved contributors:
-
-1. Open `lib/contributors.ts`
-2. Add, remove, or update entries in the `contributorProfiles` array
-3. Optionally specify:
-   - `featuredRepo`: Repository to highlight (defaults to the user's most starred repo)
-   - `role`: Contributor's team or role inside Disney
-   - `description`: Custom blurb that will appear in the UI
-
-The API at `/api/contributors` automatically enriches the profile with GitHub data, including the avatar, bio, and highlighted repository details. Once the configuration is updated and the site redeployed, the contributor profiles section on the Contributing page will reflect the changes immediately.
-
 ## Configuring GitHub Organizations
 
 The site fetches repositories from multiple Disney GitHub organizations. To add or remove organizations:
@@ -219,28 +203,7 @@ export const organizationNames: Record<string, string> = {
 }
 ```
 
-The repository listings on the Release page and homepage will automatically include repositories from all configured organizations. Users can filter by organization using the dropdown filter.
-
-## Updating the Featured Contributor
-
-To update the featured contributor section on the homepage:
-
-1. Open `lib/featured.ts`
-2. Update the `featuredConfig` object:
-   - `username`: GitHub username to feature
-   - `featuredRepo`: Specific repository name (optional - if null, will use the user's most starred repo)
-   - `description`: Custom description for the featured section
-
-Example:
-```typescript
-export const featuredConfig = {
-  username: 'kylifornication-code',
-  featuredRepo: 'my-awesome-project', // or null for auto-selection
-  description: 'Highlighting Disney employees who are making significant contributions to open source.',
-}
-```
-
-The featured section will automatically update when the page is refreshed.
+The repository listings on the homepage will automatically include repositories from all configured organizations.
 
 ## Contributing
 

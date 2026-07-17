@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata: Metadata = {
   title: 'Disney Open Source Program Office',
-  description: 'Learn about open source policies, usage, distribution, release, and contribution at The Walt Disney Company',
+  description: 'Learn about open source policies at The Walt Disney Company',
   keywords: ['Disney', 'Open Source', 'OSS', 'GitHub', 'Contributions'],
 }
 

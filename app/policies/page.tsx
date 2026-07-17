@@ -69,8 +69,7 @@ export default function PoliciesPage() {
         <section className="mb-12 bg-disney-light dark:bg-gray-800 p-6 rounded-lg">
           <h2 className="text-2xl font-semibold text-disney-navy dark:text-disney-blue mb-4">Questions?</h2>
           <p className="text-gray-700 dark:text-gray-300">
-            For questions about open source policies, please contact the Open Source Program Office 
-            or refer to the additional documentation sections on usage, distribution, release, and contribution.
+            For questions about open source policies, please contact the Open Source Program Office.
           </p>
         </section>
       </div>

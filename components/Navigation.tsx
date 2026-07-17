@@ -13,10 +13,6 @@ export default function Navigation() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/policies', label: 'Policies' },
-    { href: '/usage', label: 'Using Open Source' },
-    { href: '/distribution', label: 'Distribution' },
-    { href: '/release', label: 'Release' },
-    { href: '/contribution', label: 'Contributing' },
   ]
 
   return (
