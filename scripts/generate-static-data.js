@@ -36,7 +36,7 @@ async function getOrgRepositories(org) {
       owner: org,
     }))
   } catch (error) {
-    console.error(`Error fetching repositories for ${org}:`, error)
+    console.error('Error fetching repositories for %s:', org, error)
     return []
   }
 }

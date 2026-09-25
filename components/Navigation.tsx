@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { useTheme } from './ThemeProvider'
+import { safeUrl } from '@/lib/url'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -46,7 +47,7 @@ export default function Navigation() {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={safeUrl(link.href)}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   pathname === link.href
                     ? 'text-disney-blue dark:text-disney-blue bg-disney-light dark:bg-gray-800'
@@ -90,7 +91,7 @@ export default function Navigation() {
             {navLinks.map((link) => (
               <Link
                 key={link.href}
-                href={link.href}
+                href={safeUrl(link.href)}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   pathname === link.href
                     ? 'text-disney-blue dark:text-disney-blue bg-disney-light dark:bg-gray-800'

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { organizationNames } from '@/lib/organizations'
+import { safeUrl } from '@/lib/url'
 
 interface Repository {
   id: number
@@ -251,7 +252,7 @@ export default function Home() {
                         <div className="flex-1">
                           <h3 className="text-xl font-semibold text-disney-navy dark:text-disney-blue">
                             <Link
-                              href={repo.html_url}
+                              href={safeUrl(repo.html_url)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="hover:text-disney-blue transition-colors"

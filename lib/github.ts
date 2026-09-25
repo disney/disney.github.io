@@ -46,7 +46,7 @@ export async function getOrgRepositories(org: string): Promise<Repository[]> {
       owner: org,
     }))
   } catch (error) {
-    console.error(`Error fetching repositories for ${org}:`, error)
+    console.error('Error fetching repositories for %s:', org, error)
     // Return empty array on error to prevent site breakage
     return []
   }
